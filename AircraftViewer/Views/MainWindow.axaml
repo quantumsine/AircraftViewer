@@ -1,15 +1,15 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AircraftViewer.ViewModels"
+        xmlns:mapsui="using:Mapsui.UI.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        x:DataType="vm:MainWindowViewModel"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
         x:Class="AircraftViewer.Views.MainWindow"
-        Title="The Aircraft Viewer"
-        Background="#000814"
-        MinWidth="900"
-        MinHeight="600">
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AircraftViewer"
+        Width="1200" Height="700">
 
     <Grid RowDefinitions="Auto,*,Auto">
 
@@ -60,16 +60,7 @@
                     CornerRadius="4"
                     ClipToBounds="True"
                     Margin="0,0,8,0">
-                <Grid>
-                    <Rectangle Fill="#0D1B2A"/>
-                    <!-- Replace this TextBlock with your actual map control -->
-                    <TextBlock Text="Map View"
-                               FontSize="16"
-                               Foreground="#2A4A6B"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               IsVisible="{Binding IsMapEmpty}"/>
-                </Grid>
+                <mapsui:MapControl Map="{Binding Map}"/>
             </Border>
 
             <!-- Right: Selected Aircraft Details Panel -->

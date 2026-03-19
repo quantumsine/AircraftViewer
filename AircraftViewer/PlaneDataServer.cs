@@ -2,8 +2,8 @@
 using System.Net.Http;
 using System.Threading;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Avalonia.Data;
 
 namespace AircraftViewer;
 
@@ -25,24 +25,42 @@ public class PlaneDataServer
         _client.DefaultRequestHeaders.Add("User-Agent",
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
     }
-
-    public async IAsyncEnumerable<string> StreamJSONAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
+    
+    public async IAsyncEnumerable<string> StreamJSONAsync(
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         while (!ct.IsCancellationRequested)
         {
-            string json = "";
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Fetching from OpenSky...");
+        
+            HttpResponseMessage response;
             try
             {
-                json = await _client.GetStringAsync(_baseUrl, ct);
-
+                response = await _client.GetAsync(_baseUrl, ct);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e);
-                json = $"Error: {e.Message}";
+                Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] ERROR fetching: {ex.Message}");
+                await Task.Delay(10_000, ct);
+                continue;
             }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] HTTP {(int)response.StatusCode} — retrying in 10s");
+                await Task.Delay(10_000, ct);
+                continue;
+            }
+
+            var json = await response.Content.ReadAsStringAsync(ct);
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] OK — {json.Length} bytes received");
             yield return json;
-            await Task.Delay(5000, ct);
+
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Waiting 10s before next poll...");
+            await Task.Delay(10_000, ct);
         }
+
+        Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Tracking stopped.");
     }
+   
 }
