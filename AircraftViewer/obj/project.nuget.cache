@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0nyD5wVatqU=",
+  "dgSpecHash": "31f6bcxpKL4=",
   "success": true,
   "projectFilePath": "C:\\Users\\bindo\\RiderProjects\\AircraftViewer\\AircraftViewer\\AircraftViewer.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.25547.20250602\\avalonia.angle.windows.natives.2.1.25547.20250602.nupkg.sha512",
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.buildservices\\11.3.2\\avalonia.buildservices.11.3.2.nupkg.sha512",
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.controls.colorpicker\\11.3.12\\avalonia.controls.colorpicker.11.3.12.nupkg.sha512",
+    "C:\\Users\\bindo\\.nuget\\packages\\avalonia.controls.datagrid\\11.2.3\\avalonia.controls.datagrid.11.2.3.nupkg.sha512",
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.desktop\\11.3.12\\avalonia.desktop.11.3.12.nupkg.sha512",
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.diagnostics\\11.3.12\\avalonia.diagnostics.11.3.12.nupkg.sha512",
     "C:\\Users\\bindo\\.nuget\\packages\\avalonia.fonts.inter\\11.3.12\\avalonia.fonts.inter.11.3.12.nupkg.sha512",

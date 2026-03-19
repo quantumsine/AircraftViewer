@@ -3,18 +3,251 @@
         xmlns:vm="using:AircraftViewer.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AircraftViewer.Views.MainWindow"
+        mc:Ignorable="d"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="AircraftViewer">
+        x:Class="AircraftViewer.Views.MainWindow"
+        Title="The Aircraft Viewer"
+        Background="#000814"
+        MinWidth="900"
+        MinHeight="600">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <Grid RowDefinitions="Auto,*,Auto">
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ROW 0 — Top Header Bar                      -->
+        <!-- ═══════════════════════════════════════════ -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Background="#000814"
+              Margin="20,16,20,8">
 
+            <!-- Left: App title -->
+            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                <TextBlock Text="The Aircraft Viewer"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="#FFFFFF"/>
+                <TextBlock Text="made in C#, .NET"
+                           FontSize="12"
+                           FontStyle="Italic"
+                           Foreground="#6B8BAD"/>
+            </StackPanel>
+
+            <!-- Right: Selected Aircraft Panel Header -->
+            <Border Grid.Column="1"
+                    Background="#00122C"
+                    CornerRadius="4"
+                    Padding="20,10"
+                    MinWidth="300">
+                <TextBlock Text="Selected Aircraft"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Foreground="#FFFFFF"
+                           HorizontalAlignment="Center"/>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ROW 1 — Main Content: Map + Details Panel  -->
+        <!-- ═══════════════════════════════════════════ -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,300"
+              Margin="20,0,20,0">
+
+            <!-- Left: Map Area -->
+            <Border Grid.Column="0"
+                    Background="#0D1B2A"
+                    CornerRadius="4"
+                    ClipToBounds="True"
+                    Margin="0,0,8,0">
+                <Grid>
+                    <Rectangle Fill="#0D1B2A"/>
+                    <!-- Replace this TextBlock with your actual map control -->
+                    <TextBlock Text="Map View"
+                               FontSize="16"
+                               Foreground="#2A4A6B"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding IsMapEmpty}"/>
+                </Grid>
+            </Border>
+
+            <!-- Right: Selected Aircraft Details Panel -->
+            <Border Grid.Column="1"
+                    Background="#000F24"
+                    CornerRadius="4"
+                    Padding="16"
+                    Margin="8,0,0,0">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="0">
+
+                        <!-- No selection state -->
+                        <TextBlock Text="No aircraft selected."
+                                   FontSize="13"
+                                   Foreground="#4A6A8A"
+                                   FontStyle="Italic"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,20,0,0"
+                                   IsVisible="{Binding HasNoSelection}"/>
+
+                        <!-- Detail rows — shown when aircraft is selected -->
+                        <StackPanel IsVisible="{Binding HasSelection}" Spacing="0">
+
+                            <!-- ICAO -->
+                            <Border Background="#00122C" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="ICAO"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Icao}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Callsign -->
+                            <Border Background="#000F24" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Callsign"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Callsign}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Time -->
+                            <Border Background="#00122C" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Time (UTC)"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.PosTime, StringFormat=\{0:HH:mm:ss\}}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Speed -->
+                            <Border Background="#000F24" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Speed (kts)"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Speed, StringFormat=\{0:F1\}}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Track -->
+                            <Border Background="#00122C" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Track (°)"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Trak, StringFormat=\{0:F1\}}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Latitude -->
+                            <Border Background="#000F24" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Latitude"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Latitude, StringFormat=\{0:F4\}}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Longitude -->
+                            <Border Background="#00122C" CornerRadius="3" Margin="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="*,*">
+                                    <TextBlock Grid.Column="0" Text="Longitude"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="#6B8BAD" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding SelectedAircraft.Longitude, StringFormat=\{0:F4\}}"
+                                               FontSize="13" Foreground="#FFFFFF"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ROW 2 — Bottom Aircraft Table               -->
+        <!-- ═══════════════════════════════════════════ -->
+        <Border Grid.Row="2"
+                Background="#000814"
+                Margin="20,8,20,16"
+                MaxHeight="220"
+                CornerRadius="4"
+                BorderBrush="#1A2F50"
+                BorderThickness="1">
+
+            <DataGrid ItemsSource="{Binding Aircraft}"
+                      SelectedItem="{Binding SelectedAircraft, Mode=TwoWay}"
+                      AutoGenerateColumns="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="True"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      HeadersVisibility="Column"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+
+                <DataGrid.Columns>
+
+                    <DataGridTextColumn Header="ICAO"
+                                        Binding="{Binding Icao}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Callsign"
+                                        Binding="{Binding Callsign}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Time (UTC)"
+                                        Binding="{Binding PosTime, StringFormat=\{0:HH:mm:ss\}}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Speed (kts)"
+                                        Binding="{Binding Speed, StringFormat=\{0:F1\}}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Track (°)"
+                                        Binding="{Binding Trak, StringFormat=\{0:F1\}}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Latitude"
+                                        Binding="{Binding Latitude, StringFormat=\{0:F4\}}"
+                                        Width="*"/>
+
+                    <DataGridTextColumn Header="Longitude"
+                                        Binding="{Binding Longitude, StringFormat=\{0:F4\}}"
+                                        Width="*"/>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+    </Grid>
 </Window>

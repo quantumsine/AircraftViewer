@@ -1,15 +1,96 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AircraftViewer.App"
              xmlns:local="using:AircraftViewer"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             x:Class="AircraftViewer.App"
+             RequestedThemeVariant="Dark">
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
-  
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Brand Colors -->
+            <Color x:Key="BackgroundColor">#000814</Color>
+            <Color x:Key="TableHeaderColor">#00122C</Color>
+            <Color x:Key="FontColor">#FFFFFF</Color>
+            <Color x:Key="AccentColor">#1A3A6B</Color>
+            <Color x:Key="RowHoverColor">#0A1F3D</Color>
+            <Color x:Key="SelectedRowColor">#00122C</Color>
+            <Color x:Key="BorderColor">#1A2F50</Color>
+            <Color x:Key="PanelColor">#000F24</Color>
+
+            <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+            <SolidColorBrush x:Key="TableHeaderBrush" Color="{StaticResource TableHeaderColor}"/>
+            <SolidColorBrush x:Key="FontBrush" Color="{StaticResource FontColor}"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+            <SolidColorBrush x:Key="RowHoverBrush" Color="{StaticResource RowHoverColor}"/>
+            <SolidColorBrush x:Key="SelectedRowBrush" Color="{StaticResource SelectedRowColor}"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+            <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource PanelColor}"/>
+
+            <!-- DataGrid Overrides -->
+            <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{StaticResource TableHeaderColor}"/>
+            <SolidColorBrush x:Key="DataGridRowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+        </Style>
+
+        <!-- DataGrid global styling -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="RowBackground" Value="{StaticResource BackgroundBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource TableHeaderBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+        </Style>
+
+        <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{StaticResource RowHoverBrush}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{StaticResource SelectedRowBrush}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+
+        <Style Selector="DataGridCell">
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- TextBlock default -->
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+        </Style>
+
+        <!-- ScrollBar styling -->
+        <Style Selector="ScrollBar">
+            <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+        </Style>
+
     </Application.Styles>
+
 </Application>

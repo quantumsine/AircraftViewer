@@ -3,6 +3,7 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="AircraftViewer/App.axaml" value="AircraftViewer/AircraftViewer.csproj" />
         <entry key="AircraftViewer/Views/MainWindow.axaml" value="AircraftViewer/AircraftViewer.csproj" />
       </map>
     </option>

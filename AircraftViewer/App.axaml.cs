@@ -3,9 +3,11 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
+using AircraftViewer.Models;
 using Avalonia.Markup.Xaml;
 using AircraftViewer.ViewModels;
 using AircraftViewer.Views;
+
 
 namespace AircraftViewer;
 
