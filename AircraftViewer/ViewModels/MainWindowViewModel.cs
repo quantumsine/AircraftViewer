@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using AircraftViewer.Models;
-using Avalonia;
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapsui;
 using Mapsui.Extensions;
@@ -19,6 +21,27 @@ namespace AircraftViewer.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    
+    private static readonly Dictionary<int, string> _iconPaths = new();
+    
+    static MainWindowViewModel()
+    {
+        for (int i = 0; i < 25; i++)
+        {
+            var uri    = new Uri($"avares://AircraftViewer/Assets/PlaneIcons/plane{i:D2}.png");
+            var stream = AssetLoader.Open(uri);
+        
+            // Write to a temp file so Mapsui can load it via file://
+            var tempPath = Path.Combine(Path.GetTempPath(), $"plane{i:D2}.png");
+            using (var fs = File.Create(tempPath))
+                stream.CopyTo(fs);
+        
+            _iconPaths[i] = $"file://{tempPath}";
+            Console.WriteLine($"[Init] Extracted plane{i:D2}.png → {_iconPaths[i]}");
+        }
+    }
+    
+    
     [ObservableProperty]
     private ObservableCollection<BasicAircraft> _aircraft = new();
     
@@ -29,44 +52,57 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var map = new Map();
         map.Layers.Add(OpenStreetMap.CreateTileLayer());
-        map.Layers.Add(CreateAircraftLayer());
+        map.Layers.Add(CreateAircraftLayer([]));
+        map.Navigator.CenterOnAndZoomTo(new MPoint(0, 0), map.Navigator.Resolutions[3]);
         return map;
     }
-
-    private static ILayer CreateAircraftLayer()
+    
+    private static ILayer CreateAircraftLayer(IEnumerable<BasicAircraft> aircraftList)
     {
         var features = new List<IFeature>();
 
-        var aircraft = new[]
+        foreach (var aircraft in aircraftList)
         {
-            (callsign: "DLH123", lat: 50.0379, lon: 8.5622),  // Frankfurt
-            (callsign: "BAW456", lat: 51.5074, lon: -0.1278),  // London
-            (callsign: "AFR789", lat: 48.8566, lon:  2.3522),  // Paris
-        };
-
-
-        foreach (var (callsign, lat, lon) in aircraft)
-        {
-            var point = SphericalMercator.FromLonLat(lon, lat).ToMPoint();
-            var feature = new PointFeature(point);
-            feature["callsign"] = callsign;
-            feature.Styles.Add(new SymbolStyle
+            if (aircraft.Coordinate is null)
             {
-                SymbolScale = 0.7,
-                Fill = new Brush(Color.FromArgb(220, 30, 144, 255)),
-                Outline = new Pen(Color.White, 1.5)
+                Console.WriteLine($"[Layer] Skipping {aircraft.Icao} null coordinate");
+                continue;
+            }
+            
+            var point = SphericalMercator.FromLonLat(
+                aircraft.Longitude, 
+                aircraft.Latitude
+            ).ToMPoint();
+
+            var feature = new PointFeature(point);
+            feature["icao"] = aircraft.Icao;
+
+            // Same heading → icon index formula as your Java code
+            var heading   = aircraft.Trak;
+            var iconIndex =  (int)Math.Round(heading / 14.4) % 25;;
+
+            feature.Styles.Add(new ImageStyle
+            {
+                Image       = _iconPaths[iconIndex],
+                SymbolScale    = 0.5,
+                SymbolRotation = heading,
+                RotateWithMap  = true,
             });
+
             features.Add(feature);
         }
 
+        Console.WriteLine($"[Layer] Built aircraft layer with {features.Count} features");
+
         return new MemoryLayer
         {
-            Name = "Aircraft",
+            Name     = "Aircraft",
             Features = features,
-            Style = null,
+            Style    = null,
         };
     }
-
+    
+    
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     [NotifyPropertyChangedFor(nameof(HasNoSelection))]
@@ -75,10 +111,7 @@ public partial class MainWindowViewModel : ViewModelBase
     // Used to show/hide the "No aircraft selected" placeholder
     public bool HasSelection   => SelectedAircraft is not null;
     public bool HasNoSelection => SelectedAircraft is null;
-
-    // Set to false once your real map control is wired up
-    public bool IsMapEmpty => true;
-
+    
     private CancellationTokenSource? _cts;
 
     public async Task StartTrackingAsync()
@@ -107,7 +140,20 @@ public partial class MainWindowViewModel : ViewModelBase
             
             Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Parsed {updated.Count} aircraft");
             Aircraft = updated;
+            
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                var layer    = CreateAircraftLayer(updated);
+                var existing = Map.Layers.FindLayer("Aircraft").FirstOrDefault();
+                if (existing is not null)
+                    Map.Layers.Remove(existing);
+                Map.Layers.Add(layer);
+                Map.RefreshData();
+            });
+
+            Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Map layer refreshed with {updated.Count} aircraft");
         }
     }
-    public void StopTracking() => _cts?.Cancel();
+
+     public void StopTracking() => _cts?.Cancel();
 }

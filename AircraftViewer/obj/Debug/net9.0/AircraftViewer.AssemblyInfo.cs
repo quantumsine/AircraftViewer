@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AircraftViewer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5583075ef98c56b639a3052383869dcb2ac667c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a327b8a0e98596d90840217c0d8844194bbfc5a")]
 [assembly: System.Reflection.AssemblyProductAttribute("AircraftViewer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AircraftViewer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
