@@ -77,7 +77,6 @@ public partial class MainWindowViewModel : ViewModelBase
             var feature = new PointFeature(point);
             feature["icao"] = aircraft.Icao;
 
-            // Same heading → icon index formula as your Java code
             var heading   = aircraft.Trak;
             var iconIndex =  (int)Math.Round(heading / 14.4) % 25;;
 
